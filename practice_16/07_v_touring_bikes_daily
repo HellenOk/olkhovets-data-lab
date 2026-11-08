@@ -1,0 +1,19 @@
+select [rows].[SalesOrderDateKey] as [SalesOrderDateKey],
+    sum([rows].[Quantity]) as [units_sold]
+from 
+(
+    select [$Outer].[SalesOrderDateKey],
+        [$Outer].[Quantity]
+    from [sales_wh].[dbo].[FactSalesOrder] as [$Outer]
+    inner join 
+    (
+        select [_].[ProductKey] as [ProductKey2],
+            [_].[ProductAltKey] as [ProductAltKey],
+            [_].[ProductName] as [ProductName],
+            [_].[Category] as [Category],
+            [_].[ListPrice] as [ListPrice]
+        from [sales_wh].[dbo].[DimProduct] as [_]
+        where [_].[Category] = 'Touring Bikes' and [_].[Category] is not null
+    ) as [$Inner] on ([$Outer].[ProductKey] = [$Inner].[ProductKey2])
+) as [rows]
+group by [SalesOrderDateKey]

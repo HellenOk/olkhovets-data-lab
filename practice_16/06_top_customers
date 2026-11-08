@@ -1,0 +1,24 @@
+SELECT TOP 10
+    c.[CustomerKey] AS customer_key,
+    c.[FirstName] + ' ' + c.[LastName] AS customer_name,
+    c.[City] AS city,
+    c.[CountryRegion] AS country_region,
+    COUNT(f.[SalesOrderKey]) AS orders_cnt,
+    MIN(d.[DateAltKey]) AS first_order_date,
+    MAX(d.[DateAltKey]) AS last_order_date,
+    SUM(f.[SalesTotal]) AS total_spent
+FROM 
+    dbo.FactSalesOrder f
+INNER JOIN 
+    dbo.DimCustomer c ON f.[CustomerKey] = c.[CustomerKey]
+INNER JOIN 
+    dbo.DimDate d ON f.[SalesOrderDateKey] = d.[DateKey]
+GROUP BY 
+    c.[CustomerKey],
+    c.[FirstName],
+    c.[LastName],
+    c.[City],
+    c.[CountryRegion]
+ORDER BY 
+    total_spent DESC, 
+    customer_key ASC;

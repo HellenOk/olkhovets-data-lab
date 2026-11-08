@@ -1,0 +1,45 @@
+-- 1. Створення або оновлення аналітичного подання
+CREATE OR ALTER VIEW dbo.v_order_totals AS
+WITH OrderAggregates AS (
+    SELECT 
+        [SalesOrderNumber] AS sales_order_number,
+        CAST([OrderDate] AS DATE) AS order_date,
+        [EmailAddress] AS customer_email,
+        COUNT([SalesOrderLineNumber]) AS lines_cnt,
+        ROUND(SUM(CAST([Quantity] AS DECIMAL(18,4)) * CAST([UnitPrice] AS DECIMAL(18,4))), 2) AS amount,
+        ROUND(SUM(CAST([TaxAmount] AS DECIMAL(18,4))), 2) AS tax
+    FROM 
+        dbo.sales
+    GROUP BY 
+        [SalesOrderNumber],
+        [OrderDate],
+        [EmailAddress]
+)
+SELECT 
+    sales_order_number,
+    order_date,
+    customer_email,
+    lines_cnt,
+    amount,
+    tax,
+    CAST((amount + tax) AS DECIMAL(18,2)) AS total
+FROM 
+    OrderAggregates;
+GO
+
+-- 2. Перевірочний запит згідно з умовами завдання
+SELECT 
+    sales_order_number,
+    order_date,
+    customer_email,
+    lines_cnt,
+    amount,
+    tax,
+    total
+FROM 
+    dbo.v_order_totals
+WHERE 
+    lines_cnt >= 5
+ORDER BY 
+    total DESC, 
+    sales_order_number ASC;

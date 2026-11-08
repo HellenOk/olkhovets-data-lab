@@ -1,0 +1,14 @@
+SELECT TOP 10
+    [Item] AS item,
+    COUNT(DISTINCT [SalesOrderNumber]) AS orders_cnt,
+    SUM([Quantity]) AS units_sold,
+    ROUND(SUM(CAST([Quantity] AS DECIMAL(18,4)) * CAST([UnitPrice] AS DECIMAL(18,4))), 2) AS revenue
+FROM 
+    dbo.sales
+WHERE 
+    [OrderDate] BETWEEN '2021-01-01' AND '2021-12-31'
+GROUP BY 
+    [Item]
+ORDER BY 
+    revenue DESC, 
+    item ASC;

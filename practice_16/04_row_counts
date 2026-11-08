@@ -1,0 +1,9 @@
+SELECT 'DimCustomer' AS table_name, COUNT(*) AS rows_cnt FROM dbo.DimCustomer
+UNION ALL
+SELECT 'DimDate', COUNT(*) FROM dbo.DimDate
+UNION ALL
+SELECT 'DimProduct', COUNT(*) FROM dbo.DimProduct
+UNION ALL
+SELECT 'FactSalesOrder', COUNT(*) FROM dbo.FactSalesOrder
+ORDER BY 
+    table_name ASC;
