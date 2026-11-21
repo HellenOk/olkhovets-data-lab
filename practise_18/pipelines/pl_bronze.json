@@ -1,0 +1,221 @@
+{
+    "name": "pl_bronze",
+    "objectId": "38406de5-0dd0-4f31-9ce1-b03ef93d330c",
+    "properties": {
+        "activities": [
+            {
+                "name": "Get files to load",
+                "type": "Lookup",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "source": {
+                        "type": "LakehouseTableSource"
+                    },
+                    "firstRowOnly": false,
+                    "datasetSettings": {
+                        "annotations": [],
+                        "linkedService": {
+                            "name": "lh_bronze",
+                            "properties": {
+                                "annotations": [],
+                                "type": "Lakehouse",
+                                "typeProperties": {
+                                    "workspaceId": "849c76fd-6bac-4f4b-a392-585ee8209672",
+                                    "artifactId": "8fa66807-d065-47c5-b925-e32048c90493",
+                                    "rootFolder": "Tables"
+                                }
+                            }
+                        },
+                        "type": "LakehouseTable",
+                        "schema": [],
+                        "typeProperties": {
+                            "schema": "control",
+                            "table": "files_to_load"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "Filter active files",
+                "type": "Filter",
+                "dependsOn": [
+                    {
+                        "activity": "Get files to load",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Get files to load').output.value\n",
+                        "type": "Expression"
+                    },
+                    "condition": {
+                        "value": "@item().is_active\n",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "For each file",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "Filter active files",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Filter active files').output.value\n",
+                        "type": "Expression"
+                    },
+                    "isSequential": true,
+                    "activities": [
+                        {
+                            "name": "Copy file to raw",
+                            "type": "Copy",
+                            "state": "Inactive",
+                            "onInactiveMarkAs": "Succeeded",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "typeProperties": {
+                                "source": {
+                                    "type": "BinarySource",
+                                    "storeSettings": {
+                                        "type": "AzureBlobStorageReadSettings",
+                                        "recursive": true
+                                    },
+                                    "formatSettings": {
+                                        "type": "BinaryReadSettings"
+                                    },
+                                    "datasetSettings": {
+                                        "annotations": [],
+                                        "type": "Binary",
+                                        "typeProperties": {
+                                            "location": {
+                                                "type": "AzureBlobStorageLocation",
+                                                "fileName": {
+                                                    "value": "@item().file_name\n",
+                                                    "type": "Expression"
+                                                },
+                                                "container": "data-lake"
+                                            }
+                                        },
+                                        "externalReferences": {
+                                            "connection": "9f602d5d-8237-4064-8250-2aec4296c291"
+                                        }
+                                    }
+                                },
+                                "sink": {
+                                    "type": "BinarySink",
+                                    "storeSettings": {
+                                        "type": "LakehouseWriteSettings"
+                                    },
+                                    "datasetSettings": {
+                                        "annotations": [],
+                                        "linkedService": {
+                                            "name": "lh_bronze",
+                                            "properties": {
+                                                "annotations": [],
+                                                "type": "Lakehouse",
+                                                "typeProperties": {
+                                                    "workspaceId": "849c76fd-6bac-4f4b-a392-585ee8209672",
+                                                    "artifactId": "8fa66807-d065-47c5-b925-e32048c90493",
+                                                    "rootFolder": "Files"
+                                                }
+                                            }
+                                        },
+                                        "type": "Binary",
+                                        "typeProperties": {
+                                            "location": {
+                                                "type": "LakehouseLocation",
+                                                "fileName": {
+                                                    "value": "@item().file_name\n",
+                                                    "type": "Expression"
+                                                },
+                                                "folderPath": "raw"
+                                            }
+                                        }
+                                    }
+                                },
+                                "enableStaging": false
+                            }
+                        },
+                        {
+                            "name": "Load file notebook",
+                            "type": "TridentNotebook",
+                            "dependsOn": [
+                                {
+                                    "activity": "Copy file to raw",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "typeProperties": {
+                                "notebookId": "4bdc748b-3465-4ea5-8812-77ced91439ef",
+                                "workspaceId": "849c76fd-6bac-4f4b-a392-585ee8209672",
+                                "parameters": {
+                                    "file_name": {
+                                        "value": {
+                                            "value": "@item().file_name",
+                                            "type": "Expression"
+                                        },
+                                        "type": "string"
+                                    },
+                                    "target_schema": {
+                                        "value": {
+                                            "value": "@item().target_schema\n\n",
+                                            "type": "Expression"
+                                        },
+                                        "type": "string"
+                                    },
+                                    "target_table": {
+                                        "value": {
+                                            "value": "@item().target_table",
+                                            "type": "Expression"
+                                        },
+                                        "type": "string"
+                                    },
+                                    "load_mode": {
+                                        "value": {
+                                            "value": "@item().load_mode",
+                                            "type": "Expression"
+                                        },
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "lastModifiedByObjectId": "0c2de938-727a-4131-9a9b-73f0f8ed92e7",
+        "lastPublishTime": "2026-11-20T19:39:36Z"
+    }
+}

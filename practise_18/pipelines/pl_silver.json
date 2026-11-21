@@ -1,0 +1,26 @@
+{
+    "name": "pl_silver",
+    "objectId": "6e147d53-5546-4939-a98d-65e3cc076c96",
+    "properties": {
+        "activities": [
+            {
+                "name": "Run clean_silver",
+                "type": "TridentNotebook",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "notebookId": "4dee0022-c142-46a1-bfc8-2a26a9b5130d",
+                    "workspaceId": "849c76fd-6bac-4f4b-a392-585ee8209672"
+                }
+            }
+        ],
+        "lastModifiedByObjectId": "0c2de938-727a-4131-9a9b-73f0f8ed92e7",
+        "lastPublishTime": "2026-11-21T16:56:57Z"
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "name": "pl_gold",
+    "objectId": "66652c71-67b9-4cf1-a263-3c01460f4667",
+    "properties": {
+        "activities": [
+            {
+                "name": "Run build_gold",
+                "type": "TridentNotebook",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "notebookId": "6fbc6624-58bd-4720-81e7-6a227e94bfb9",
+                    "workspaceId": "849c76fd-6bac-4f4b-a392-585ee8209672"
+                }
+            }
+        ],
+        "lastModifiedByObjectId": "0c2de938-727a-4131-9a9b-73f0f8ed92e7",
+        "lastPublishTime": "2026-11-21T16:59:39Z"
+    }
+}

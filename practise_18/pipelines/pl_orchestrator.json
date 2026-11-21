@@ -1,0 +1,69 @@
+{
+    "name": "pl_orchestrator",
+    "objectId": "2e622c33-032a-493d-8010-da908d735550",
+    "properties": {
+        "activities": [
+            {
+                "name": "Run bronze",
+                "type": "ExecutePipeline",
+                "dependsOn": [],
+                "policy": {
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "38406de5-0dd0-4f31-9ce1-b03ef93d330c",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true
+                }
+            },
+            {
+                "name": "Run silver",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "Run bronze",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "6e147d53-5546-4939-a98d-65e3cc076c96",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true
+                }
+            },
+            {
+                "name": "Run gold",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "Run silver",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "66652c71-67b9-4cf1-a263-3c01460f4667",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true
+                }
+            }
+        ],
+        "lastModifiedByObjectId": "0c2de938-727a-4131-9a9b-73f0f8ed92e7",
+        "lastPublishTime": "2026-11-21T17:12:16Z"
+    }
+}
