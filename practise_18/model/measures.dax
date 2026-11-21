@@ -1,0 +1,5 @@
+Readings Count = COUNTROWS ( fact_readings )
+
+Avg Value = DIVIDE ( SUM ( fact_readings[value] ), [Readings Count] )
+
+Avg PM2.5 = CALCULATE ( [Avg Value], REMOVEFILTERS ( dim_sensor[metric] ), dim_sensor[metric] = "PM2.5" )
